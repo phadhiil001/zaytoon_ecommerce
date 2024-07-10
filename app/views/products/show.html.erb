@@ -1,3 +1,28 @@
-<h1><%= @product.name %></h1>
-<p><%= @product.description %></p>
-<p><%= number_to_currency(@product.price) %></p>
+<!-- app/views/products/show.html.erb -->
+
+<div class="mx-auto md:w-2/3 w-full flex">
+  <div class="md:w-1/2">
+    <% if @product.images.attached? %>
+      <%= image_tag url_for(@product.images.first), class: "w-full h-auto object-cover rounded-lg hover:brightness-75 transition-all duration-300" %>
+    <% else %>
+      <div class="w-full h-48 bg-gray-200 mb-4"></div>
+    <% end %>
+  </div>
+  <div class="md:w-1/2 md:pl-8">
+    <h1 class="text-4xl font-bold mb-4"><%= @product.name %></h1>
+    <p class="text-xl font-semibold text-gray-700 mb-4"><%= number_to_currency(@product.price) %></p>
+    <p class="mb-4"><%= @product.description %></p>
+    <% if @product.options.present? %>
+      <p class="mb-4"><strong>Options:</strong> <%= @product.options %></p>
+    <% end %>
+    <% if @product.served_with.present? %>
+      <p class="mb-4"><strong>Served With:</strong> <%= @product.served_with %></p>
+    <% end %>
+    <% if @product.pieces.present? %>
+      <p class="mb-4"><strong>Pieces:</strong> <%= @product.pieces %></p>
+    <% end %>
+    <% if @product.extra.present? %>
+      <p class="mb-4"><strong>Extra:</strong> <%= @product.extra %></p>
+    <% end %>
+  </div>
+</div>

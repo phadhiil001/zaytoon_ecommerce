@@ -1,10 +1,20 @@
 <h1><%= @category.name %></h1>
-<p><%= @category.description %></p>
-<h2>Products</h2>
-<% @products.each do |product| %>
-  <div>
-    <h3><%= link_to product.name, product_path(product) %></h3>
-    <p><%= product.description %></p>
-    <p><%= number_to_currency(product.price) %></p>
-  </div>
-<% end %>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+  <% @products.each do |product| %>
+    <%= link_to product_path(product), class: "group" do %>
+      <div class="bg-white rounded-lg shadow p-4 text-center transform transition-transform duration-200 ease-in-out hover:scale-105">
+        <% if product.images.attached? %>
+          <%= image_tag url_for(product.images.first), class: "rounded-lg hover:brightness-75 transition-all duration-300" %>
+        <% else %>
+          <div class="w-full h-48 bg-gray-200 mb-4"></div>
+        <% end %>
+        <h3 class="text-xl font-semibold text-blue-600 group-hover:text-blue-800"><%= product.name %></h3>
+        <p class="mt-2"><%= product.description %></p>
+        <p class="mt-2 font-bold text-lg"><%= number_to_currency(product.price) %></p>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+<div class="mt-8">
+  <%= paginate @products %>
+</div>

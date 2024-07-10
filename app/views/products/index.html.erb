@@ -1,20 +1,43 @@
-<%# <h1>Products</h1> %>
+<!-- app/views/products/index.html.erb -->
+<h1 class="text-4xl font-bold text-center my-8">Products</h1>
 
-
-<h1 class="text-3xl font-semibold my-4">All Our Products</h1>
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-  <% @products.each do |product| %>
-    <%= link_to product_path(product), class: "group" do %>
-      <div class="bg-white rounded-lg shadow p-4 text-center transform transition-transform duration-200 ease-in-out hover:scale-105">
-        <% if product.images.attached? %>
-          <%= image_tag url_for(product.images.first), class: "w-full h-48 object-cover mb-4 transform transition-transform duration-200 ease-in-out group-hover:scale-110" %>
-        <% else %>
-          <div class="w-full h-48 bg-gray-200 mb-4"></div>
-        <% end %>
-        <h3 class="text-xl font-semibold text-blue-600 group-hover:text-blue-800"><%= product.name %></h3>
-        <p class="mt-2"><%= product.description %></p>
-        <p class="mt-2 font-bold text-lg"><%= number_to_currency(product.price) %></p>
-      </div>
-    <% end %>
+<div class="flex justify-end mb-8">
+  <%= form_with url: products_path, method: :get, local: true, class: "flex items-center space-x-2" do %>
+    <div class="relative">
+      <%= text_field_tag :search, params[:search], placeholder: "Search products...", class: "shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10" %>
+      <%= select_tag :category, options_from_collection_for_select(Category.all, :id, :name, params[:category]), include_blank: true, class: "shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-2 md:mt-0 md:ml-2" %>
+      <button type="submit" class="absolute right-0 top-0 mt-2 mr-2">
+        <svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"></path>
+        </svg>
+      </button>
+    </div>
   <% end %>
 </div>
+
+<% if @products.any? %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <% @products.each do |product| %>
+      <%= link_to product_path(product), class: "group" do %>
+        <div class="bg-white rounded-lg shadow p-4 text-center transform transition-transform duration-200 ease-in-out hover:scale-105">
+          <% if product.images.attached? %>
+            <%= image_tag url_for(product.images.first), class: "rounded-lg hover:brightness-75 transition-all duration-300" %>
+          <% else %>
+            <div class="w-full h-48 bg-gray-200 mb-4"></div>
+          <% end %>
+          <h3 class="text-xl font-semibold text-blue-600 group-hover:text-blue-800"><%= product.name %></h3>
+          <p class="mt-2"><%= product.description %></p>
+          <p class="mt-2 font-bold text-lg"><%= number_to_currency(product.price) %></p>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="mt-8">
+    <%= paginate @products %>
+  </div>
+<% else %>
+  <div class="text-center text-gray-700 mt-8">
+    <p>No products found matching your search criteria.</p>
+  </div>
+<% end %>
