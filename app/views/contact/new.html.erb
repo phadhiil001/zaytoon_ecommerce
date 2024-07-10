@@ -1,4 +1,21 @@
-<div>
-  <h1 class="font-bold text-4xl">Contact#new</h1>
-  <p>Find me in app/views/contact/new.html.erb</p>
-</div>
+<h1>Contact Us</h1>
+<%= form_with model: @contact, url: contact_path, local: true do |form| %>
+  <div>
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+  <div>
+    <%= form.label :email %>
+    <%= form.email_field :email %>
+  </div>
+  <div>
+    <%= form.label :message %>
+    <%= form.text_area :message %>
+  </div>
+  <div>
+    <%= form.submit "Send" %>
+  </div>
+<% end %>
+<% if notice %>
+  <p><%= notice %></p>
+<% end %>

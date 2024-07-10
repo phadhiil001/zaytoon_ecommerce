@@ -1,4 +1,14 @@
-<div>
-  <h1 class="font-bold text-4xl">Home#index</h1>
-  <p>Find me in app/views/home/index.html.erb</p>
-</div>
+<h1>Welcome to Zaytoon Restaurant</h1>
+<p>Explore our delicious menu and special offers!</p>
+<h2>Categories</h2>
+<% @categories.each do |category| %>
+  <h3><%= link_to category.name, category_path(category) %></h3>
+<% end %>
+<h2>Top Products</h2>
+<% @products.each do |product| %>
+  <div>
+    <h3><%= link_to product.name, product_path(product) %></h3>
+    <p><%= product.description %></p>
+    <p><%= number_to_currency(product.price) %></p>
+  </div>
+<% end %>
