@@ -6,8 +6,8 @@ class Product < ApplicationRecord
   serialize :options, Array, coder: JSON
   serialize :extra, Hash, coder: JSON
 
-  validates :name, presence: true, uniqueness: true
-  validates :description, presence: true, length: { maximum: 1000 }
+  validates :name, presence: true
+  validates :description, length: { maximum: 1000 }, allow_blank: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :category_id, presence: true
 end
