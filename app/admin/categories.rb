@@ -1,31 +1,42 @@
 ActiveAdmin.register Category do
   permit_params :name, :description, :image
 
-  form do |f|
-    f.semantic_errors *f.object.errors.full_messages
+  index do
+    selectable_column
+    id_column
+    column :name
+    column :description
+    column :created_at
+    actions
+  end
 
-    f.inputs "Category Details" do
+  form do |f|
+    f.inputs do
       f.input :name
       f.input :description
       f.input :image, as: :file
     end
-
     f.actions
   end
 
   show do
     attributes_table do
+      row :id
       row :name
       row :description
       row :created_at
       row :updated_at
-      row "Image" do |category|
+      row :image do |category|
         if category.image.attached?
-          image_tag url_for(category.image), size: "100x100"
+          image_tag url_for(category.image)
         else
-          "No Image"
+          content_tag(:span, "No image attached")
         end
       end
     end
+    active_admin_comments
   end
+
+  filter :name
+  filter :created_at
 end

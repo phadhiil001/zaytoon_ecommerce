@@ -29,59 +29,59 @@
 # # Suppress warnings
 # $VERBOSE = nil
 
-# require 'json'
-# require 'open-uri'
-# require 'uri'
+require 'json'
+require 'open-uri'
+require 'uri'
 
-# # Load JSON data
-# file_path = Rails.root.join('db', 'menu.json')
-# json = JSON.parse(File.read(file_path))
+# Load JSON data
+file_path = Rails.root.join('db', 'menu.json')
+json = JSON.parse(File.read(file_path))
 
-# # Function to create products
-# def create_product(product_data, category)
-#   if product_data["name"].present? && product_data["price"].present? && product_data["price"].is_a?(Numeric)
-#     product = Product.find_or_create_by(
-#       name: product_data["name"],
-#       description: product_data["description"] || "No description available",
-#       price: product_data["price"],
-#       category: category
-#     )
-#     product.options = product_data["options"] if product_data["options"]
-#     product.served_with = product_data["served_with"] if product_data["served_with"]
-#     product.pieces = product_data["pieces"] if product_data["pieces"]
-#     product.extra = product_data["extra"] if product_data["extra"]
-#     product.save!
+# Function to create products
+def create_product(product_data, category)
+  if product_data["name"].present? && product_data["price"].present? && product_data["price"].is_a?(Numeric)
+    product = Product.find_or_create_by(
+      name: product_data["name"],
+      description: product_data["description"] || "No description available",
+      price: product_data["price"],
+      category: category
+    )
+    product.options = product_data["options"] if product_data["options"]
+    product.served_with = product_data["served_with"] if product_data["served_with"]
+    product.pieces = product_data["pieces"] if product_data["pieces"]
+    product.extra = product_data["extra"] if product_data["extra"]
+    product.save!
 
-#     # Check for and attach images
-#     if product_data["image_url"].present?
-#       begin
-#         downloaded_image = URI.open(product_data["image_url"])
-#         product.images.attach(io: downloaded_image, filename: File.basename(URI.parse(product_data["image_url"]).path))
-#         puts "Image successfully attached to product: #{product.name}"
-#       rescue OpenURI::HTTPError, URI::InvalidURIError, Errno::ENOENT => e
-#         puts "Error downloading image for #{product_data['name']}: #{e.message}"
-#       end
-#     else
-#       puts "No image URL provided for product: #{product.name}"
-#     end
-#   else
-#     puts "Skipping product #{product_data['name']} due to missing or invalid price"
-#   end
-# end
+    # Check for and attach images
+    if product_data["image_url"].present?
+      begin
+        downloaded_image = URI.open(product_data["image_url"])
+        product.images.attach(io: downloaded_image, filename: File.basename(URI.parse(product_data["image_url"]).path))
+        puts "Image successfully attached to product: #{product.name}"
+      rescue OpenURI::HTTPError, URI::InvalidURIError, Errno::ENOENT => e
+        puts "Error downloading image for #{product_data['name']}: #{e.message}"
+      end
+    else
+      puts "No image URL provided for product: #{product.name}"
+    end
+  else
+    puts "Skipping product #{product_data['name']} due to missing or invalid price"
+  end
+end
 
-# # Create categories and products
-# json.each do |category_name, products|
-#   category = Category.find_or_create_by(name: category_name.titleize)
-#   products.each do |product_data|
-#     if product_data["items"]
-#       product_data["items"].each do |nested_product|
-#         create_product(nested_product, category)
-#       end
-#     else
-#       create_product(product_data, category)
-#     end
-#   end
-# end
+# Create categories and products
+json.each do |category_name, products|
+  category = Category.find_or_create_by(name: category_name.titleize)
+  products.each do |product_data|
+    if product_data["items"]
+      product_data["items"].each do |nested_product|
+        create_product(nested_product, category)
+      end
+    else
+      create_product(product_data, category)
+    end
+  end
+end
 
 
 # db/seeds.rb

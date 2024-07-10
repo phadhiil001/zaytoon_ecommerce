@@ -78,3 +78,5 @@ gem "kaminari", "~> 1.2"
 gem "sassc-rails", "~> 2.1"
 
 gem "mini_magick", "~> 4.13"
+
+gem "ransack", "~> 4.1"

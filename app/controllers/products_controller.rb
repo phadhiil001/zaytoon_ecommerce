@@ -4,12 +4,10 @@ class ProductsController < ApplicationController
     @products = Product.all
 
     if params[:search].present?
-      Rails.logger.debug "Search query: #{params[:search]}"
-      @products = @products.where('name LIKE ? OR description LIKE ?', "%#{params[:search]}%", "%#{params[:search]}%")
+      @products = @products.where('products.name LIKE ? OR products.description LIKE ?', "%#{params[:search]}%", "%#{params[:search]}%")
     end
 
     if params[:category].present?
-      Rails.logger.debug "Category filter: #{params[:category]}"
       @products = @products.joins(:category).where(categories: { id: params[:category] })
     end
 
