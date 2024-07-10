@@ -10,4 +10,13 @@ class Product < ApplicationRecord
   validates :description, length: { maximum: 1000 }, allow_blank: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :category_id, presence: true
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["category_id", "created_at", "description", "extra", "id", "id_value", "name", "options", "pieces", "price", "served_with", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["category", "images_attachments", "images_blobs", "order_items"]
+  end
+
 end
