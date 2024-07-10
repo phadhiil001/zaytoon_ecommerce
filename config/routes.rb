@@ -5,10 +5,11 @@ Rails.application.routes.draw do
 
   root 'home#index'
 
-  get 'about', to: 'static_pages#about'
+  get '/about', to: 'static_pages#show', slug: 'about'
+  get '/contact', to: 'contact#show'
   resources :categories, only: [:index, :show]
   resources :products, only: [:index, :show]
-  resource :contact, only: [:new, :create]
+  # resource :contact, only: [:new, :create]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
