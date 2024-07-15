@@ -1,9 +1,13 @@
-# app/admin/products.rb
 ActiveAdmin.register Product do
   permit_params :name, :description, :price, :category_id, images: [], options: []
 
+  filter :name
+  filter :category
+  filter :price
+  filter :created_at
+
   form do |f|
-    f.semantic_errors *f.object.errors.full_messages
+    f.semantic_errors *f.object.errors
 
     f.inputs "Product Details" do
       f.input :name
