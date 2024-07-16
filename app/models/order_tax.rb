@@ -7,4 +7,8 @@ class OrderTax < ApplicationRecord
   def self.ransackable_attributes(auth_object = nil)
     ["created_at", "gst", "hst", "id", "id_value", "order_id", "pst", "qst", "updated_at"]
   end
+
+  def total_tax
+    gst + pst + hst + qst
+  end
 end

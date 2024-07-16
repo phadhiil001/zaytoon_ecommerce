@@ -1,0 +1,26 @@
+<h1>Order Confirmation</h1>
+
+<p>Order ID: <%= @order.id %></p>
+<p>Address: <%= @order.address %></p>
+<p>Total Price: <%= number_to_currency(@order.total_price) %></p>
+<p>Status: <%= @order.status %></p>
+
+<h2>Order Items</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Quantity</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @order.order_items.each do |item| %>
+      <tr>
+        <td><%= item.product.name %></td>
+        <td><%= item.quantity %></td>
+        <td><%= number_to_currency(item.price) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

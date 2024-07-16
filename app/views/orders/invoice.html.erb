@@ -1,0 +1,41 @@
+<h1 class="text-2xl font-bold mb-4">Invoice</h1>
+
+<% if current_user.address.blank? || current_user.province.blank? %>
+  <p class="text-red-500">Please update your profile with your address and province to proceed with the checkout.</p>
+  <%= link_to "Update Profile", edit_user_registration_path, class: "ml-2 bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700" %>
+<% else %>
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+    <div class="px-4 py-5 sm:px-6">
+      <h2 class="text-lg leading-6 font-medium text-gray-900">Shipping Address</h2>
+      <p class="mt-1 text-sm text-gray-500"><%= current_user.address %></p>
+      <p class="mt-1 text-sm text-gray-500"><%= current_user.province.name %></p>
+    </div>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h2 class="text-lg leading-6 font-medium text-gray-900">Order Summary</h2>
+      <% @order_items.each do |item| %>
+        <div class="mt-4">
+          <p class="text-gray-700"><%= item.product.name %> - <%= number_to_currency(item.price) %> x <%= item.quantity %></p>
+        </div>
+      <% end %>
+      <div class="mt-4 border-t border-gray-200 pt-4">
+        <p class="text-gray-700">GST: <%= number_to_percentage(@order_tax.gst * 100, precision: 2) %></p>
+        <p class="text-gray-700">PST: <%= number_to_percentage(@order_tax.pst * 100, precision: 2) %></p>
+        <p class="text-gray-700">HST: <%= number_to_percentage(@order_tax.hst * 100, precision: 2) %></p>
+        <% if current_user.province.name == 'Quebec' %>
+          <p class="text-gray-700">QST: <%= number_to_percentage(@order_tax.qst * 100, precision: 2) %></p>
+        <% end %>
+        <p class="text-gray-700 font-bold">Total: <%= number_to_currency(@order.total_price) %></p>
+      </div>
+      <div class="mt-6">
+        <%= form_with(model: @order, url: checkout_order_path, method: :post, local: true) do |f| %>
+          <%= f.hidden_field :address, value: current_user.address %>
+          <%= f.hidden_field :province_id, value: current_user.province_id %>
+          <%= f.submit "Checkout", class: "ml-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
