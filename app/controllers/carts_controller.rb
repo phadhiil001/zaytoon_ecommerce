@@ -1,33 +1,50 @@
+# app/controllers/carts_controller.rb
 class CartsController < ApplicationController
+  before_action :initialize_cart
+
   def show
-    @cart_items = session[:cart] || {}
-    @products = Product.find(@cart_items.keys)
+    @products = Product.find(@cart.keys)
   end
 
   def add_item
-    product_id = params[:product_id].to_i
-    quantity = params[:quantity].to_i
+    product_id = params[:product_id].to_s
+    quantity = (params[:quantity] || 1).to_i
 
-    session[:cart] ||= {}
-    session[:cart][product_id] = (session[:cart][product_id] || 0) + quantity
+    if @cart[product_id]
+      @cart[product_id] += quantity
+    else
+      @cart[product_id] = quantity
+    end
 
-    redirect_to cart_path
+    session[:cart] = @cart
+    redirect_to cart_path, notice: 'Item added to cart'
   end
 
   def update_item
-    product_id = params[:product_id].to_i
+    product_id = params[:product_id].to_s
     quantity = params[:quantity].to_i
 
-    session[:cart][product_id] = quantity
-    session[:cart].delete(product_id) if quantity <= 0
+    if quantity > 0
+      @cart[product_id] = quantity
+    else
+      @cart.delete(product_id)
+    end
 
-    redirect_to cart_path
+    session[:cart] = @cart
+    redirect_to cart_path, notice: 'Cart updated'
   end
 
   def remove_item
-    product_id = params[:product_id].to_i
-    session[:cart].delete(product_id)
+    product_id = params[:product_id].to_s
+    @cart.delete(product_id)
 
-    redirect_to cart_path
+    session[:cart] = @cart
+    redirect_to cart_path, notice: 'Item removed from cart'
+  end
+
+  private
+
+  def initialize_cart
+    @cart = session[:cart] ||= {}
   end
 end

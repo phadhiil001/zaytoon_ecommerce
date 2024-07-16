@@ -1,25 +1,24 @@
-<!-- app/views/orders/show.html.erb -->
-<h1>Order Details</h1>
+<h1 class="text-2xl font-bold mb-4">Order Details</h1>
 <p>Status: <%= @order.status %></p>
 <p>Total Price: <%= number_to_currency(@order.total_price) %></p>
 
-<h2>Items</h2>
-<table>
+<h2 class="text-xl font-bold mt-6">Items</h2>
+<table class="min-w-full bg-white border mt-4">
   <thead>
     <tr>
-      <th>Product</th>
-      <th>Quantity</th>
-      <th>Price</th>
-      <th>Total</th>
+      <th class="py-2 px-4 border-b">Product</th>
+      <th class="py-2 px-4 border-b">Quantity</th>
+      <th class="py-2 px-4 border-b">Price</th>
+      <th class="py-2 px-4 border-b">Total</th>
     </tr>
   </thead>
   <tbody>
     <% @order.order_items.each do |item| %>
       <tr>
-        <td><%= item.product.name %></td>
-        <td><%= item.quantity %></td>
-        <td><%= number_to_currency(item.price) %></td>
-        <td><%= number_to_currency(item.quantity * item.price) %></td>
+        <td class="py-2 px-4 border-b"><%= item.product.name %></td>
+        <td class="py-2 px-4 border-b"><%= item.quantity %></td>
+        <td class="py-2 px-4 border-b"><%= number_to_currency(item.price) %></td>
+        <td class="py-2 px-4 border-b"><%= number_to_currency(item.quantity * item.price) %></td>
       </tr>
     <% end %>
   </tbody>

@@ -45,6 +45,13 @@
     <% if @product.extra.present? %>
       <h3 class="mb-4"><strong>Extra:</strong> <%= @product.extra %></h3>
     <% end %>
+
+    <%= form_with url: add_item_cart_path(product_id: @product.id), method: :post, local: true do %>
+      <%= hidden_field_tag :product_id, @product.id %>
+      <%= number_field_tag :quantity, 1, min: 1, class: "border rounded w-16" %>
+      <%= submit_tag 'Add to Cart', class: "ml-2 bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700" %>
+    <% end %>
+
     <%= link_to "Back to products", products_path, class: "mt-4 inline-block rounded-lg py-3 px-4 bg-gray-300 hover:bg-gray-400 text-gray-800 transition-colors duration-200" %>
   </div>
 </div>
