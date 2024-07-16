@@ -1,16 +1,29 @@
 <% content_for :title, "Products" %>
 <h1 class="text-4xl font-bold text-center my-8">Products</h1>
 
-<div class="flex justify-end mb-8">
-  <%= form_with url: products_path, method: :get, local: true, class: "flex items-center space-x-2" do %>
-    <div class="relative">
-      <%= text_field_tag :search, params[:search], placeholder: "Search products...", class: "shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10" %>
-      <%= select_tag :category, options_from_collection_for_select(Category.all, :id, :name, params[:category]), include_blank: true, class: "shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-2 md:mt-0 md:ml-2" %>
-      <button type="submit" class="absolute right-0 top-0 mt-2 mr-2">
-        <svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"></path>
-        </svg>
-      </button>
+<div class="mb-8 flex justify-between items-center">
+  <!-- Search Bar -->
+  <%= form_with url: products_path, method: :get, local: true, class: "flex space-x-4" do %>
+    <div>
+      <%= text_field_tag :search, params[:search], placeholder: "Search products...", class: "shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+    <div>
+      <%= select_tag :category, options_from_collection_for_select(Category.all, :id, :name, params[:category]), include_blank: true, class: "shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+    <div>
+      <%= submit_tag "Search", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+    </div>
+  <% end %>
+</div>
+
+<div class="mb-8 flex justify-between items-center">
+  <!-- Filter Options -->
+  <%= form_with url: products_path, method: :get, local: true, class: "flex space-x-4" do %>
+    <div>
+      <%= select_tag :filter, options_for_select([['On Sale', 'on_sale'], ['New', 'new'], ['Recently Updated', 'recently_updated']], params[:filter]), include_blank: 'Filter by', class: "shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+    <div>
+      <%= submit_tag "Filter", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
     </div>
   <% end %>
 </div>
@@ -41,3 +54,5 @@
     <p>No products found matching your search criteria.</p>
   </div>
 <% end %>
+
+

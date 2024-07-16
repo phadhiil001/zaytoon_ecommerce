@@ -1,4 +1,3 @@
-# app/controllers/products_controller.rb
 class ProductsController < ApplicationController
   def index
     @products = Product.all
@@ -11,10 +10,21 @@ class ProductsController < ApplicationController
       @products = @products.joins(:category).where(categories: { id: params[:category] })
     end
 
+    if params[:filter].present?
+      case params[:filter]
+      when 'on_sale'
+        @products = @products.on_sale
+      when 'new'
+        @products = @products.new_products
+      when 'recently_updated'
+        @products = @products.recently_updated
+      end
+    end
+
     @products = @products.page(params[:page]).per(10)
   end
 
   def show
-    @product = Product.find_by(id: params[:id])
+    @product = Product.find(params[:id])
   end
 end
