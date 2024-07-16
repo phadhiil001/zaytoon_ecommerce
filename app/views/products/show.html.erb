@@ -21,18 +21,29 @@
   <div class="md:w-1/2 md:pl-8">
     <h1 class="text-4xl font-bold mb-4"><%= @product.name %></h1>
     <p class="text-xl font-semibold text-gray-700 mb-4"><%= number_to_currency(@product.price) %></p>
-    <p class="mb-4"><%= @product.description %></p>
+    <h3 class="mb-4"><%= @product.description %></h3>
+    <!-- Options Section -->
     <% if @product.options.present? %>
-      <p class="mb-4"><strong>Options:</strong> <%= @product.options.join(", ") %></p>
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold mb-2">Choose Option</h3>
+        <ul class="list-disc list-inside">
+          <% @product.options.each do |option| %>
+            <li class="mb-1">
+              <%= radio_button_tag "option", option, false, class: "mr-2" %>
+              <%= label_tag "option_#{option}", option %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
     <% if @product.served_with.present? %>
-      <p class="mb-4"><strong>Served With:</strong> <%= @product.served_with %></p>
+      <h3 class="mb-4"><strong>Served With:</strong> <%= @product.served_with %></h3>
     <% end %>
     <% if @product.pieces.present? %>
-      <p class="mb-4"><strong>Pieces:</strong> <%= @product.pieces %></p>
+      <h3 class="mb-4"><strong>Pieces:</strong> <%= @product.pieces %></h3>
     <% end %>
     <% if @product.extra.present? %>
-      <p class="mb-4"><strong>Extra:</strong> <%= @product.extra %></p>
+      <h3 class="mb-4"><strong>Extra:</strong> <%= @product.extra %></h3>
     <% end %>
     <%= link_to "Back to products", products_path, class: "mt-4 inline-block rounded-lg py-3 px-4 bg-gray-300 hover:bg-gray-400 text-gray-800 transition-colors duration-200" %>
   </div>

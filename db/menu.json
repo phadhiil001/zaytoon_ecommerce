@@ -151,7 +151,8 @@
             "price": 25.00,
             "description": "Hummus + mini falafel board + Labneh + za'atar rolls board.",
             "options": [
-                "Both - $25.00 / One - $15.00"
+                "Both - $25.00 ",
+                "One - $15.00"
             ],
             "image_url": "https://i0.wp.com/www.zaytoonwpg.com/wp-content/uploads/2023/08/example-copy-scaled.jpg?fit=1024%2C1024&ssl=1"
         }
