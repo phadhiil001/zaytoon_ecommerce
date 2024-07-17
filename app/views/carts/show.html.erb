@@ -1,0 +1,40 @@
+<!-- app/views/carts/show.html.erb -->
+<h1 class="text-2xl font-bold mb-4">Your Cart</h1>
+<% if @cart.any? %>
+  <table class="min-w-full bg-white border">
+    <thead>
+      <tr>
+        <th class="py-2 px-4 border-b">Product</th>
+        <th class="py-2 px-4 border-b">Quantity</th>
+        <th class="py-2 px-4 border-b">Price</th>
+        <th class="py-2 px-4 border-b">Total</th>
+        <th class="py-2 px-4 border-b">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @products.each do |product| %>
+        <% quantity = @cart[product.id.to_s] || 0 %>
+        <% price = product.price || 0 %>
+        <tr>
+          <td class="py-2 px-4 border-b"><%= product.name %></td>
+          <td class="py-2 px-4 border-b">
+            <%= form_with url: update_item_cart_path(product), method: :put, local: true do %>
+              <%= number_field_tag :quantity, quantity, min: 1, class: "border rounded w-16" %>
+              <%= submit_tag 'Update', class: "ml-2 bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700" %>
+            <% end %>
+          </td>
+          <td class="py-2 px-4 border-b"><%= number_to_currency(price) %></td>
+          <td class="py-2 px-4 border-b"><%= number_to_currency(price * quantity) %></td>
+          <td class="py-2 px-4 border-b">
+            <%= link_to 'Remove', remove_item_cart_path(product), method: :delete, class: "bg-red-500 text-white px-4 py-1 rounded hover:bg-red-700" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <div class="mt-4">
+    <%= link_to 'Checkout', new_order_path, class: "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" %>
+  </div>
+<% else %>
+  <p>Your cart is empty.</p>
+<% end %>

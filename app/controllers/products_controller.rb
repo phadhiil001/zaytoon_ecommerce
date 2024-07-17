@@ -1,22 +1,30 @@
-# app/controllers/products_controller.rb
 class ProductsController < ApplicationController
   def index
     @products = Product.all
 
     if params[:search].present?
-      Rails.logger.debug "Search query: #{params[:search]}"
-      @products = @products.where('name LIKE ? OR description LIKE ?', "%#{params[:search]}%", "%#{params[:search]}%")
+      @products = @products.where('products.name LIKE ? OR products.description LIKE ?', "%#{params[:search]}%", "%#{params[:search]}%")
     end
 
     if params[:category].present?
-      Rails.logger.debug "Category filter: #{params[:category]}"
       @products = @products.joins(:category).where(categories: { id: params[:category] })
+    end
+
+    if params[:filter].present?
+      case params[:filter]
+      when 'on_sale'
+        @products = @products.on_sale
+      when 'new'
+        @products = @products.new_products
+      when 'recently_updated'
+        @products = @products.recently_updated
+      end
     end
 
     @products = @products.page(params[:page]).per(10)
   end
 
   def show
-    @product = Product.find_by(id: params[:id])
+    @product = Product.find(params[:id])
   end
 end

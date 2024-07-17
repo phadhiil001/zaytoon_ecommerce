@@ -1,0 +1,37 @@
+<!-- app/views/checkouts/new.html.erb -->
+<h1 class="text-2xl font-bold mb-4">Checkout</h1>
+<%= form_with model: @order, url: checkouts_path, local: true do |f| %>
+  <div class="mb-4">
+    <%= f.label :address, class: "block text-gray-700" %>
+    <%= f.text_field :address, class: "border rounded w-full py-2 px-3" %>
+  </div>
+  <div class="mb-4">
+    <%= f.label :province_id, class: "block text-gray-700" %>
+    <%= f.collection_select :province_id, Province.all, :id, :name, { prompt: "Select Province" }, class: "border rounded w-full py-2 px-3" %>
+  </div>
+  <div class="mt-6">
+    <%= f.submit "Place Order", class: "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" %>
+  </div>
+<% end %>
+
+<h2 class="text-xl font-bold mt-6">Order Summary</h2>
+<table class="min-w-full bg-white border mt-4">
+  <thead>
+    <tr>
+      <th class="py-2 px-4 border-b">Product</th>
+      <th class="py-2 px-4 border-b">Quantity</th>
+      <th class="py-2 px-4 border-b">Price</th>
+      <th class="py-2 px-4 border-b">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @products.each do |product| %>
+      <tr>
+        <td class="py-2 px-4 border-b"><%= product.name %></td>
+        <td class="py-2 px-4 border-b"><%= @cart_items[product.id] %></td>
+        <td class="py-2 px-4 border-b"><%= number_to_currency(product.price) %></td>
+        <td class="py-2 px-4 border-b"><%= number_to_currency(product.price * @cart_items[product.id]) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

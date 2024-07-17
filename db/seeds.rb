@@ -1,12 +1,12 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# # This file should ensure the existence of records required to run the application in every environment (production,
+# # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
+# # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
+# #
+# # Example:
+# #
+# #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
+# #     MovieGenre.find_or_create_by!(name: genre_name)
+# #   end
 AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
 
 
@@ -24,7 +24,9 @@ Province.create([
 ])
 
 
-# db/seeds.rb
+Page.create(title: "About Us", content: "This is the About Us page content.", slug: "about")
+Page.create(title: "Contact Us", content: "This is the Contact Us page content.", slug: "contact")
+
 
 # Suppress warnings
 $VERBOSE = nil
@@ -44,7 +46,10 @@ def create_product(product_data, category)
       name: product_data["name"],
       description: product_data["description"] || "No description available",
       price: product_data["price"],
-      category: category
+      category: category,
+      on_sale: [true, false].sample, # Randomly mark some products as on sale
+      created_at: Time.now - rand(1..3).days, # Randomly set created_at within the last 10 days
+      updated_at: Time.now - rand(1..3).days   # Randomly set updated_at within the last 5 days
     )
     product.options = product_data["options"] if product_data["options"]
     product.served_with = product_data["served_with"] if product_data["served_with"]

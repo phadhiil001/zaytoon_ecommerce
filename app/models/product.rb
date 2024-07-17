@@ -6,6 +6,10 @@ class Product < ApplicationRecord
   serialize :options, Array, coder: JSON
   serialize :extra, Hash, coder: JSON
 
+  scope :on_sale, -> { where(on_sale: true) }
+  scope :new_products, -> { where('created_at >= ?', 3.days.ago) }
+  scope :recently_updated, -> { where('updated_at >= ?', 3.days.ago) }
+
   validates :name, presence: true
   validates :description, length: { maximum: 1000 }, allow_blank: true
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }

@@ -1,6 +1,16 @@
-<!-- app/views/products/show.html.erb -->
+<% content_for :title, @product.name %>
 
-<div class="mx-auto md:w-2/3 w-full flex">
+<div class="max-w-7xl w-full mx-12 px-3 mb-5">
+  <div class="flex items-center space-x-1 md:ml-48">
+    <%= link_to @product.category.name, category_path(@product.category), class: "px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200" %>
+    <span class="text-gray-600">&gt;&gt;</span>
+    <%= link_to "Products", products_path, class: "px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200" %>
+    <span class="text-gray-700">&gt;&gt;</span>
+    <%= link_to @product.name, @product, class: "px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200" %>
+  </div>
+</div>
+
+<div class="mx-auto md:w-2/3 w-full flex flex-col md:flex-row">
   <div class="md:w-1/2">
     <% if @product.images.attached? %>
       <%= image_tag url_for(@product.images.first), class: "w-full h-auto object-cover rounded-lg hover:brightness-75 transition-all duration-300" %>
@@ -11,18 +21,65 @@
   <div class="md:w-1/2 md:pl-8">
     <h1 class="text-4xl font-bold mb-4"><%= @product.name %></h1>
     <p class="text-xl font-semibold text-gray-700 mb-4"><%= number_to_currency(@product.price) %></p>
-    <p class="mb-4"><%= @product.description %></p>
+    <h3 class="mb-4"><%= @product.description %></h3>
+
+    <!-- Options Section -->
     <% if @product.options.present? %>
-      <p class="mb-4"><strong>Options:</strong> <%= @product.options %></p>
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold mb-2">Choose Option</h3>
+        <ul class="list-disc list-inside">
+          <% @product.options.each do |option| %>
+            <li class="mb-1">
+              <%= radio_button_tag "option", option, false, class: "mr-2" %>
+              <%= label_tag "option_#{option}", option %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
+
     <% if @product.served_with.present? %>
-      <p class="mb-4"><strong>Served With:</strong> <%= @product.served_with %></p>
+      <h3 class="mb-4"><strong>Served With:</strong> <%= @product.served_with %></h3>
     <% end %>
+
     <% if @product.pieces.present? %>
-      <p class="mb-4"><strong>Pieces:</strong> <%= @product.pieces %></p>
+      <h3 class="mb-4"><strong>Pieces:</strong> <%= @product.pieces %></h3>
     <% end %>
+
     <% if @product.extra.present? %>
-      <p class="mb-4"><strong>Extra:</strong> <%= @product.extra %></p>
+      <h3 class="mb-4"><strong>Extra:</strong> <%= @product.extra %></h3>
     <% end %>
+
+    <%= form_with url: add_item_order_path(product_id: @product.id), method: :post, local: true, id: "add-to-order-form" do %>
+      <%= hidden_field_tag :product_id, @product.id %>
+      <div class="flex items-center space-x-2 mb-4">
+        <button type="button" class="px-2 py-1 bg-gray-200 rounded quantity-btn" data-action="decrement">-</button>
+        <%= number_field_tag :quantity, 1, min: 1, class: "border rounded w-16 text-center" %>
+        <button type="button" class="px-2 py-1 bg-gray-200 rounded quantity-btn" data-action="increment">+</button>
+      </div>
+      <%= submit_tag 'Add to Order', class: "ml-2 bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700" %>
+    <% end %>
+
+
+
+
+    <%= link_to "Back to products", products_path, class: "mt-4 inline-block rounded-lg py-3 px-4 bg-gray-300 hover:bg-gray-400 text-gray-800 transition-colors duration-200" %>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll('.quantity-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+      var input = button.parentElement.querySelector('input[type="number"]');
+      var currentValue = parseInt(input.value);
+      if (button.dataset.action === "increment") {
+        input.value = currentValue + 1;
+      } else if (button.dataset.action === "decrement" && currentValue > 1) {
+        input.value = currentValue - 1;
+      }
+    });
+  });
+});
+
+</script>
