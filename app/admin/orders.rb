@@ -20,21 +20,43 @@ ActiveAdmin.register Order do
   index do
     selectable_column
     id_column
+    column :user
     column :status
     column :total_price
-    column :user
     column :created_at
     actions
   end
 
-  form do |f|
-    f.inputs do
-      f.input :status, as: :select, collection: ['new', 'paid', 'shipped']
-      f.input :total_price
-      f.input :user
-      f.input :province
+  show do
+    attributes_table do
+      row :user
+      row :status
+      row :total_price
+      row :created_at
+      row :updated_at
     end
-    f.actions
+
+    panel "Order Items" do
+      table_for order.order_items do
+        column :product
+        column :quantity
+        column :price
+      end
+    end
+
+    panel "Order Tax" do
+      attributes_table_for order.order_tax do
+        row :gst
+        row :pst
+        row :hst
+        row :qst
+      end
+    end
   end
+
+  filter :user
+  filter :status
+  filter :total_price
+  filter :created_at
 
 end

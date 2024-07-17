@@ -6,6 +6,10 @@ class OrdersController < ApplicationController
     @order_items = @order.order_items
   end
 
+  def past_orders
+    @orders = current_user.orders.where.not(status: 'new')
+  end
+
   def add_item
     @product = Product.find(params[:product_id])
     @order_item = @order.order_items.find_or_initialize_by(product: @product)
@@ -23,19 +27,19 @@ class OrdersController < ApplicationController
   end
 
   def update_item
-    @order_item = @order.order_items.find(params[:id])
-    if @order_item.update(quantity: params[:order_item][:quantity])
-      redirect_to order_path(@order), notice: "Order item updated"
-    else
-      redirect_to order_path(@order), alert: "Unable to update order item"
+      @order_item = @order.order_items.find(params[:item_id])
+      if @order_item.update(quantity: params[:order_item][:quantity])
+        redirect_to order_path(@order), notice: "Order item updated"
+      else
+        redirect_to order_path(@order), alert: "Unable to update order item"
+      end
     end
-  end
 
-  def remove_item
-    @order_item = @order.order_items.find(params[:id])
-    @order_item.destroy
-    redirect_to order_path(@order), notice: "Order item removed"
-  end
+    def remove_item
+      @order_item = @order.order_items.find(params[:item_id])
+      @order_item.destroy
+      redirect_to order_path(@order), notice: "Order item removed"
+    end
 
   def invoice
     if current_user.address.blank? || current_user.province.blank?
