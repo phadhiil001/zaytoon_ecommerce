@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_order, only: [:show, :add_item, :update_item, :remove_item, :invoice, :checkout, :confirm]
+  before_action :set_order, only: [:show, :add_item, :update_item, :remove_item, :invoice, :checkout, :confirm, :destroy]
 
   def show
     @order_items = @order.order_items
@@ -66,6 +66,11 @@ class OrdersController < ApplicationController
   def confirm
     @order_items = @order.order_items
     @order_tax = calculate_taxes(@order)
+  end
+
+  def destroy
+    @order.destroy
+    redirect_to past_orders_orders_path, notice: "Order deleted successfully"
   end
 
   private
