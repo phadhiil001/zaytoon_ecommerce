@@ -17,6 +17,17 @@ ActiveAdmin.register User do
 
   permit_params :email, :password, :password_confirmation, :province_id, :name, :address
 
+  controller do
+    def destroy
+      @user = User.find(params[:id])
+      if @user.destroy
+        redirect_to admin_users_path, notice: "User and associated orders were successfully deleted."
+      else
+        redirect_to admin_users_path, alert: "Unable to delete user."
+      end
+    end
+  end
+
   index do
     selectable_column
     id_column

@@ -1,0 +1,13 @@
+<!-- app/views/orders/edit_item.html.erb -->
+<h1 class="text-2xl font-bold mb-4">Edit Order Item</h1>
+<div class="bg-white shadow-md rounded-lg p-4">
+  <%= form_with model: @order_item, url: update_item_order_path(@order_item.id), method: :patch, local: true do |form| %>
+    <div class="mb-4">
+      <%= form.label :quantity, "Quantity", class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.number_field :quantity, min: 1, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+    <div class="flex items-center justify-between">
+      <%= form.submit "Update", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+    </div>
+  <% end %>
+</div>
