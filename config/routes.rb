@@ -54,8 +54,10 @@ Rails.application.routes.draw do
 
     member do
       get 'invoice', to: 'orders#invoice'
+      post 'create_checkout_session', to: 'orders#create_checkout_session'
       post 'checkout', to: 'orders#checkout'
       get 'success', to: 'orders#success'
+      get 'cancel', to: 'orders#cancel'
       patch 'update_item/:item_id', to: 'orders#update_item', as: 'update_item'
       delete 'remove_item/:item_id', to: 'orders#remove_item', as: 'remove_item'
       post 'add_item', to: 'orders#add_item', as: 'add_item'

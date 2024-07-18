@@ -74,6 +74,59 @@ class OrdersController < ApplicationController
 # end
 
 
+# def checkout
+#   @order_items = @order.order_items
+#   @order_tax = @order.order_tax || calculate_taxes(@order)
+
+#   session = Stripe::Checkout::Session.create(
+#     payment_method_types: ['card'],
+#     line_items: [{
+#       name: 'Order from Zaytoon',
+#       amount: (@order.total_price * 100).to_i,
+#       currency: 'cad',
+#       quantity: 1
+#     }],
+#     customer_email: current_user.email,
+#     metadata: {
+#       order_id: @order.id,
+#       user_id: current_user.id
+#     },
+#     success_url: success_order_url(@order),
+#     cancel_url: cancel_order_url(@order)
+#   )
+
+#   redirect_to session.url, allow_other_host: true
+# end
+
+def create_checkout_session
+  @order = Order.find(params[:id])
+  @order_items = @order.order_items
+  @order_tax = calculate_taxes(@order)
+
+  session = Stripe::Checkout::Session.create(
+    payment_method_types: ['card'],
+    mode: 'payment',
+    line_items: @order_items.map do |item|
+      {
+        price_data: {
+          currency: 'cad',
+          product_data: {
+            name: item.product.name
+          },
+          unit_amount: (item.price * 100).to_i
+        },
+        quantity: item.quantity
+      }
+    end,
+    success_url: success_order_url(@order),
+    cancel_url: order_url(@order),
+    metadata: { order_id: @order.id }
+  )
+
+  redirect_to session.url, allow_other_host: true
+end
+
+
 def checkout
   @order_items = @order.order_items
   @order_tax = @order.order_tax || calculate_taxes(@order)
@@ -118,8 +171,13 @@ end
 
   def success
     @order = Order.find(params[:id])
+    @order.update(status: 'paid')
     @order_items = @order.order_items
     @order_tax = @order.order_tax
+  end
+
+  def cancel
+    # Handle the case when the user cancels the payment
   end
 
   private
