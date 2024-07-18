@@ -1,21 +1,6 @@
 ActiveAdmin.register User do
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-  # permit_params :email, :encrypted_password, :reset_password_token, :reset_password_sent_at, :remember_created_at
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:email, :encrypted_password, :reset_password_token, :reset_password_sent_at, :remember_created_at]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
-
-  permit_params :email, :password, :password_confirmation, :province_id, :name, :address
+  permit_params :email, :password, :password_confirmation, :province_id, :name, :address, :stripe_payment_id
 
   controller do
     def destroy
@@ -56,6 +41,29 @@ ActiveAdmin.register User do
       f.input :address
     end
     f.actions
+  end
+
+  show do
+    attributes_table do
+      row :id
+      row :email
+      row :name
+      row :address
+      row :province
+      row :created_at
+      row :updated_at
+    end
+
+    panel "Orders" do
+      table_for user.orders do
+        column :id
+        column :status
+        column :total_price
+        column :stripe_payment_id
+        column :created_at
+        column :updated_at
+      end
+    end
   end
 
   class AddDeviseToUsers < ActiveRecord::Migration[6.0]
