@@ -82,3 +82,5 @@ gem "mini_magick", "~> 4.13"
 gem "ransack", "~> 4.1"
 
 gem 'font-awesome-sass', '~> 5.15'
+
+gem "stripe", "~> 12.2"

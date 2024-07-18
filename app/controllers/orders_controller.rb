@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_order, only: [:show, :add_item, :update_item, :remove_item, :invoice, :checkout, :confirm, :destroy]
+  before_action :set_order, only: [:show, :add_item, :update_item, :remove_item, :invoice, :checkout, :destroy]
 
   def show
     @order_items = @order.order_items
@@ -41,36 +41,85 @@ class OrdersController < ApplicationController
       redirect_to order_path(@order), notice: "Order item removed"
     end
 
+  # def invoice
+  #   if current_user.address.blank? || current_user.province.blank?
+  #     flash[:alert] = "Please provide your address and province."
+  #     redirect_to edit_user_registration_path
+  #     return
+  #   end
+
+  #   @order_items = @order.order_items
+  #   @order_tax = @order.order_tax || calculate_taxes(@order)
+  # end
+  #
   def invoice
+    @order_items = @order.order_items
+    @order_tax = calculate_taxes(@order)
+
     if current_user.address.blank? || current_user.province.blank?
       flash[:alert] = "Please provide your address and province."
       redirect_to edit_user_registration_path
-      return
     end
-
-    @order_items = @order.order_items
-    @order_tax = @order.order_tax || calculate_taxes(@order)
   end
 
-  def checkout
-    @order_items = @order.order_items
-    @order_tax = @order.order_tax || calculate_taxes(@order)
+# def checkout
+#   @order_items = @order.order_items
+#   @order_tax = @order.order_tax || calculate_taxes(@order)
 
-    if @order.update(order_params.merge(status: 'paid', total_price: @order.total_price + @order_tax.total_tax))
-      redirect_to order_path(@order), notice: "Order completed successfully"
+#   if @order.update(status: 'paid', total_price: @order.total_price + @order_tax.total_tax)
+#     redirect_to success_order_path(@order), notice: "Order completed successfully"
+#   else
+#     render :invoice
+#   end
+# end
+
+
+def checkout
+  @order_items = @order.order_items
+  @order_tax = @order.order_tax || calculate_taxes(@order)
+
+  token = params[:stripeToken]
+
+  begin
+    charge = Stripe::Charge.create(
+      amount: (@order.total_price * 100).to_i,
+      currency: 'cad',
+      description: 'Order Payment',
+      source: token,
+      metadata: { order_id: @order.id }
+    )
+
+    if charge.paid
+      @order.update(status: 'paid', total_price: @order.total_price + @order_tax.total_tax)
+      redirect_to success_order_path(@order), notice: "Order completed successfully"
     else
+      flash[:alert] = "Payment failed. Please try again."
       render :invoice
     end
+  rescue Stripe::CardError => e
+    flash[:alert] = e.message
+    render :invoice
   end
+end
 
-  def confirm
-    @order_items = @order.order_items
-    @order_tax = calculate_taxes(@order)
-  end
+  # def confirm
+  #   @order_items = @order.order_items
+  #   @order_tax = calculate_taxes(@order)
+  # end
 
   def destroy
     @order.destroy
     redirect_to past_orders_orders_path, notice: "Order deleted successfully"
+  end
+
+  # def success
+  #   @order = Order.find(params[:id])
+  # end
+
+  def success
+    @order = Order.find(params[:id])
+    @order_items = @order.order_items
+    @order_tax = @order.order_tax
   end
 
   private
@@ -98,6 +147,7 @@ class OrdersController < ApplicationController
   end
 
   def order_params
-    params.permit(:address, :province_id)
-  end
+  params.require(:order).permit(:status, :total_price)
+end
+
 end
