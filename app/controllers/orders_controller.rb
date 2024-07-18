@@ -41,17 +41,6 @@ class OrdersController < ApplicationController
       redirect_to order_path(@order), notice: "Order item removed"
     end
 
-  # def invoice
-  #   if current_user.address.blank? || current_user.province.blank?
-  #     flash[:alert] = "Please provide your address and province."
-  #     redirect_to edit_user_registration_path
-  #     return
-  #   end
-
-  #   @order_items = @order.order_items
-  #   @order_tax = @order.order_tax || calculate_taxes(@order)
-  # end
-  #
   def invoice
     @order_items = @order.order_items
     @order_tax = calculate_taxes(@order)
@@ -61,42 +50,6 @@ class OrdersController < ApplicationController
       redirect_to edit_user_registration_path
     end
   end
-
-# def checkout
-#   @order_items = @order.order_items
-#   @order_tax = @order.order_tax || calculate_taxes(@order)
-
-#   if @order.update(status: 'paid', total_price: @order.total_price + @order_tax.total_tax)
-#     redirect_to success_order_path(@order), notice: "Order completed successfully"
-#   else
-#     render :invoice
-#   end
-# end
-
-
-# def checkout
-#   @order_items = @order.order_items
-#   @order_tax = @order.order_tax || calculate_taxes(@order)
-
-#   session = Stripe::Checkout::Session.create(
-#     payment_method_types: ['card'],
-#     line_items: [{
-#       name: 'Order from Zaytoon',
-#       amount: (@order.total_price * 100).to_i,
-#       currency: 'cad',
-#       quantity: 1
-#     }],
-#     customer_email: current_user.email,
-#     metadata: {
-#       order_id: @order.id,
-#       user_id: current_user.id
-#     },
-#     success_url: success_order_url(@order),
-#     cancel_url: cancel_order_url(@order)
-#   )
-
-#   redirect_to session.url, allow_other_host: true
-# end
 
 def create_checkout_session
   @order = Order.find(params[:id])
@@ -118,7 +71,7 @@ def create_checkout_session
         quantity: item.quantity
       }
     end,
-    success_url: success_order_url(@order),
+    success_url: success_order_url(@order) + "?session_id={CHECKOUT_SESSION_ID}",
     cancel_url: order_url(@order),
     metadata: { order_id: @order.id }
   )
@@ -155,23 +108,23 @@ def checkout
   end
 end
 
-  # def confirm
-  #   @order_items = @order.order_items
-  #   @order_tax = calculate_taxes(@order)
-  # end
-
-  def destroy
+def destroy
     @order.destroy
     redirect_to past_orders_orders_path, notice: "Order deleted successfully"
   end
 
   # def success
   #   @order = Order.find(params[:id])
+  #   @order.update(status: 'paid', stripe_payment_id: params[:payment_intent])
+  #   @order_items = @order.order_items
+  #   @order_tax = @order.order_tax
   # end
 
   def success
-    @order = Order.find(params[:id])
-    @order.update(status: 'paid')
+    session = Stripe::Checkout::Session.retrieve(params[:session_id])
+    @order = Order.find(session.metadata.order_id)
+    @order.update(status: 'paid', stripe_payment_id: session.payment_intent)
+
     @order_items = @order.order_items
     @order_tax = @order.order_tax
   end
