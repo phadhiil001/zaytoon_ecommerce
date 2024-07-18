@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_order, only: [:show, :add_item, :update_item, :remove_item, :invoice, :checkout, :confirm, :destroy]
+  before_action :set_order, only: [:show, :add_item, :update_item, :remove_item, :invoice, :checkout, :destroy]
 
   def show
     @order_items = @order.order_items
@@ -42,35 +42,95 @@ class OrdersController < ApplicationController
     end
 
   def invoice
+    @order_items = @order.order_items
+    @order_tax = calculate_taxes(@order)
+
     if current_user.address.blank? || current_user.province.blank?
       flash[:alert] = "Please provide your address and province."
       redirect_to edit_user_registration_path
-      return
     end
-
-    @order_items = @order.order_items
-    @order_tax = @order.order_tax || calculate_taxes(@order)
   end
 
-  def checkout
-    @order_items = @order.order_items
-    @order_tax = @order.order_tax || calculate_taxes(@order)
+def create_checkout_session
+  @order = Order.find(params[:id])
+  @order_items = @order.order_items
+  @order_tax = calculate_taxes(@order)
 
-    if @order.update(order_params.merge(status: 'paid', total_price: @order.total_price + @order_tax.total_tax))
-      redirect_to order_path(@order), notice: "Order completed successfully"
+  session = Stripe::Checkout::Session.create(
+    payment_method_types: ['card'],
+    mode: 'payment',
+    line_items: @order_items.map do |item|
+      {
+        price_data: {
+          currency: 'cad',
+          product_data: {
+            name: item.product.name
+          },
+          unit_amount: (item.price * 100).to_i
+        },
+        quantity: item.quantity
+      }
+    end,
+    success_url: success_order_url(@order) + "?session_id={CHECKOUT_SESSION_ID}",
+    cancel_url: order_url(@order),
+    metadata: { order_id: @order.id }
+  )
+
+  redirect_to session.url, allow_other_host: true
+end
+
+
+def checkout
+  @order_items = @order.order_items
+  @order_tax = @order.order_tax || calculate_taxes(@order)
+
+  token = params[:stripeToken]
+
+  begin
+    charge = Stripe::Charge.create(
+      amount: (@order.total_price * 100).to_i,
+      currency: 'cad',
+      description: 'Order Payment',
+      source: token,
+      metadata: { order_id: @order.id }
+    )
+
+    if charge.paid
+      @order.update(status: 'paid', total_price: @order.total_price + @order_tax.total_tax)
+      redirect_to success_order_path(@order), notice: "Order completed successfully"
     else
+      flash[:alert] = "Payment failed. Please try again."
       render :invoice
     end
+  rescue Stripe::CardError => e
+    flash[:alert] = e.message
+    render :invoice
   end
+end
 
-  def confirm
-    @order_items = @order.order_items
-    @order_tax = calculate_taxes(@order)
-  end
-
-  def destroy
+def destroy
     @order.destroy
     redirect_to past_orders_orders_path, notice: "Order deleted successfully"
+  end
+
+  # def success
+  #   @order = Order.find(params[:id])
+  #   @order.update(status: 'paid', stripe_payment_id: params[:payment_intent])
+  #   @order_items = @order.order_items
+  #   @order_tax = @order.order_tax
+  # end
+
+  def success
+    session = Stripe::Checkout::Session.retrieve(params[:session_id])
+    @order = Order.find(session.metadata.order_id)
+    @order.update(status: 'paid', stripe_payment_id: session.payment_intent)
+
+    @order_items = @order.order_items
+    @order_tax = @order.order_tax
+  end
+
+  def cancel
+    # Handle the case when the user cancels the payment
   end
 
   private
@@ -98,6 +158,7 @@ class OrdersController < ApplicationController
   end
 
   def order_params
-    params.permit(:address, :province_id)
-  end
+  params.require(:order).permit(:status, :total_price)
+end
+
 end

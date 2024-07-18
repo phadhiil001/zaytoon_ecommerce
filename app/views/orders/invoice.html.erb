@@ -9,6 +9,7 @@
       <h2 class="text-lg leading-6 font-medium text-gray-900">Shipping Address</h2>
       <p class="mt-1 text-sm text-gray-500"><%= current_user.address %></p>
       <p class="mt-1 text-sm text-gray-500"><%= current_user.province.name %></p>
+      <%= link_to "Update Profile", edit_user_registration_path, class: "ml-2 bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700" %>
     </div>
   </div>
 
@@ -36,11 +37,7 @@
         <p class="text-gray-700 font-bold">Total: <%= number_to_currency(@order.total_price) %></p>
       </div>
       <div class="mt-6">
-        <%= form_with(model: @order, url: checkout_order_path, method: :post, local: true) do |f| %>
-          <%= f.hidden_field :address, value: current_user.address %>
-          <%= f.hidden_field :province_id, value: current_user.province_id %>
-          <%= f.submit "Checkout", class: "ml-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" %>
-        <% end %>
+        <%= link_to "Proceed to Payment", create_checkout_session_order_path(@order), method: :post, class: "ml-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" %>
       </div>
     </div>
   </div>
