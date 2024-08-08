@@ -1,27 +1,37 @@
 ActiveAdmin.register Order do
-  permit_params :status, :total_price, :user_id, :province_id, :stripe_payment_id
+
+  # See permitted parameters documentation:
+  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
+  #
+  # Uncomment all parameters which should be permitted for assignment
+  #
+  # permit_params :status, :total_price, :user_id
+  #
+  # or
+  #
+  # permit_params do
+  #   permitted = [:status, :total_price, :user_id]
+  #   permitted << :other if params[:action] == 'create' && current_user.admin?
+  #   permitted
+  # end
+
+  permit_params :status, :total_price, :user_id, :province_id
 
   index do
     selectable_column
     id_column
+    column :user
     column :status
     column :total_price
-    column :user
-    column :province
-    column :stripe_payment_id
     column :created_at
-    column :updated_at
     actions
   end
 
   show do
     attributes_table do
-      row :id
+      row :user
       row :status
       row :total_price
-      row :user
-      row :province
-      row :stripe_payment_id
       row :created_at
       row :updated_at
     end
@@ -44,11 +54,9 @@ ActiveAdmin.register Order do
     end
   end
 
+  filter :user
   filter :status
   filter :total_price
-  filter :user
-  filter :province
-  filter :stripe_payment_id
   filter :created_at
-  filter :updated_at
+
 end
