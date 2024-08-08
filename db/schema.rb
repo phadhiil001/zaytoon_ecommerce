@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_18_151115) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_18_181031) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -109,10 +109,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_18_151115) do
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "stripe_charge_id"
     t.string "name"
     t.string "email"
     t.string "address"
+    t.string "stripe_payment_id"
+    t.string "stripe_charge_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -167,10 +168,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_18_151115) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "order_items", "orders"
+  add_foreign_key "order_items", "orders", on_delete: :cascade
   add_foreign_key "order_items", "products"
-  add_foreign_key "order_taxes", "orders"
-  add_foreign_key "orders", "users"
+  add_foreign_key "order_taxes", "orders", on_delete: :cascade
+  add_foreign_key "orders", "users", on_delete: :cascade
   add_foreign_key "products", "categories"
   add_foreign_key "users", "provinces"
 end
